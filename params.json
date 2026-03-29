@@ -154,6 +154,11 @@
       "login": "only-hell",
       "id": "ladygin", 
       "app": "catty-reminders-app"
+    },
+    {
+      "login": "Barnaeva",
+      "id": "barnaeva",
+      "app": "catty-reminders-app"
     }
   ]
 }
