@@ -226,6 +226,21 @@
       "app": "catty-reminders-app"
     },
     {
+      "login": "KuzminStanislav",
+      "id": "kuzmin",
+      "app": "catty-reminders-app"
+    },
+    {
+      "login": "Dester",
+      "id": "nosov",
+      "app": "catty-reminders-app"
+    },
+    {
+      "login": "KozlovDan",
+      "id": "kozlov",
+      "app": "catty-reminders-app"
+    },
+    {
       "login": "h0shi-tech", 
       "id": "nikishin", 
       "app": "catty-reminders-app"
