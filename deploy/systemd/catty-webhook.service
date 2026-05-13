@@ -1,0 +1,17 @@
+[Unit]
+Description=Catty GitHub webhook handler
+After=network.target
+
+[Service]
+Type=simple
+User=catty
+Group=catty
+WorkingDirectory=/opt/catty/app
+EnvironmentFile=-/etc/catty/webhook.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/catty/app/.venv/bin/uvicorn webhook.main:app --host 0.0.0.0 --port 8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
