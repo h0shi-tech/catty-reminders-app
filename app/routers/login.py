@@ -6,8 +6,8 @@ This module provides routes for authentication.
 # Imports
 # --------------------------------------------------------------------------------
 
+from app import get_deploy_ref
 from app import templates
-from app import DEPLOY_REF
 from app.utils.auth import AuthCookie, get_login_form_creds, get_auth_cookie
 from app.utils.exceptions import UnauthorizedPageException
 
@@ -41,7 +41,7 @@ async def get_login(
 
   context = {
     'request': request,
-    'deploy_ref': DEPLOY_REF,
+    'deploy_ref': get_deploy_ref(),
     'invalid': invalid,
     'logged_out': logged_out,
     'unauthorized': unauthorized
