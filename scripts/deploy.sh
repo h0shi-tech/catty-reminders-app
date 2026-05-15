@@ -32,6 +32,35 @@ if [[ -z "$IMAGE" ]]; then
   exit 2
 fi
 
+docker_cli() {
+  "$DOCKER_BIN" --config "$DOCKER_CONFIG" "$@"
+}
+
+setup_ghcr_auth() {
+  DOCKER_CONFIG="${DOCKER_CONFIG:-/tmp/catty-docker-config-$$}"
+  rm -rf "$DOCKER_CONFIG"
+  mkdir -p "$DOCKER_CONFIG"
+
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    printf '%s\n' '{}' > "$DOCKER_CONFIG/config.json"
+    return
+  fi
+
+  # Do not run `docker login` on macOS over SSH: it tries osxkeychain and fails
+  # with "User interaction is not allowed (-25308)".
+  local auth
+  auth=$(printf '%s' "${GITHUB_ACTOR:-github-actions}:${GITHUB_TOKEN}" | base64 | tr -d '\n')
+  cat > "$DOCKER_CONFIG/config.json" <<EOF
+{
+  "auths": {
+    "ghcr.io": {
+      "auth": "${auth}"
+    }
+  }
+}
+EOF
+}
+
 run_docker_deploy() {
   if [[ -z "$DOCKER_BIN" ]]; then
     DOCKER_BIN="$(command -v docker || true)"
@@ -48,19 +77,12 @@ run_docker_deploy() {
   fi
 
   export PATH="$(dirname "$DOCKER_BIN"):$PATH"
-  export DOCKER_CONFIG="${DOCKER_CONFIG:-/tmp/catty-docker-config}"
-  mkdir -p "$DOCKER_CONFIG"
-  # Avoid macOS Keychain ("User interaction is not allowed") during SSH deploy.
-  printf '%s\n' '{"credsStore":""}' > "$DOCKER_CONFIG/config.json"
+  setup_ghcr_auth
 
-  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-    echo "$GITHUB_TOKEN" | "$DOCKER_BIN" login ghcr.io -u "${GITHUB_ACTOR:-github-actions}" --password-stdin
-  fi
-
-  "$DOCKER_BIN" pull "$IMAGE"
-  "$DOCKER_BIN" stop "$CONTAINER_NAME" 2>/dev/null || true
-  "$DOCKER_BIN" rm "$CONTAINER_NAME" 2>/dev/null || true
-  "$DOCKER_BIN" run -d \
+  docker_cli pull "$IMAGE"
+  docker_cli stop "$CONTAINER_NAME" 2>/dev/null || true
+  docker_cli rm "$CONTAINER_NAME" 2>/dev/null || true
+  docker_cli run -d \
     --name "$CONTAINER_NAME" \
     --restart unless-stopped \
     -p "$HOST_PORT:$CONTAINER_PORT" \
