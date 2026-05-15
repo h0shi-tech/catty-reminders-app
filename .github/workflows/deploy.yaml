@@ -5,6 +5,10 @@ on:
     types:
       - published
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -35,4 +39,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd "${{ secrets.APP_DIR }}"
-            APP_DIR="$PWD" APP_ENV_FILE="$PWD/.env" APP_SERVICE=none APP_RESTART_COMMAND="./scripts/restart-local-app.sh" RUN_TESTS=1 ./scripts/deploy.sh lab2 ${{ github.sha }}
+            IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}" \
+            GITHUB_ACTOR="${{ github.actor }}" \
+            GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            APP_DIR="$PWD" \
+            ./scripts/deploy.sh lab3 ${{ github.sha }}
