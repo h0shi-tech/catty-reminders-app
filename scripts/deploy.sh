@@ -50,6 +50,8 @@ run_docker_deploy() {
   export PATH="$(dirname "$DOCKER_BIN"):$PATH"
   export DOCKER_CONFIG="${DOCKER_CONFIG:-/tmp/catty-docker-config}"
   mkdir -p "$DOCKER_CONFIG"
+  # Avoid macOS Keychain ("User interaction is not allowed") during SSH deploy.
+  printf '%s\n' '{"credsStore":""}' > "$DOCKER_CONFIG/config.json"
 
   if [[ -n "${GITHUB_TOKEN:-}" ]]; then
     echo "$GITHUB_TOKEN" | "$DOCKER_BIN" login ghcr.io -u "${GITHUB_ACTOR:-github-actions}" --password-stdin
