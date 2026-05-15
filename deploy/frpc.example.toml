@@ -1,0 +1,17 @@
+serverAddr = "course.prafdin.ru"
+serverPort = 7000
+
+auth.method = "token"
+auth.token = "tokentoken"
+
+[[proxies]]
+name = "app-YOUR_ID"
+type = "http"
+localPort = 8181
+customDomains = ["app.YOUR_ID.course.prafdin.ru"]
+
+[[proxies]]
+name = "ssh-YOUR_ID"
+type = "tcp"
+localPort = 22
+remotePort = 2200
