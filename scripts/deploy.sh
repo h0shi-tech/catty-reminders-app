@@ -48,11 +48,16 @@ fi
 
 git -C "$APP_DIR" fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
 git -C "$APP_DIR" checkout -B "$BRANCH" "origin/$BRANCH"
-git -C "$APP_DIR" reset --hard "origin/$BRANCH"
+if [[ -n "$REQUESTED_SHA" ]]; then
+  git -C "$APP_DIR" reset --hard "$REQUESTED_SHA"
+else
+  git -C "$APP_DIR" reset --hard "origin/$BRANCH"
+fi
 
 DEPLOYED_SHA="$(git -C "$APP_DIR" rev-parse HEAD)"
 if [[ -n "$REQUESTED_SHA" && "$DEPLOYED_SHA" != "$REQUESTED_SHA" ]]; then
-  echo "Requested SHA $REQUESTED_SHA, deploying latest branch SHA $DEPLOYED_SHA"
+  echo "Requested SHA $REQUESTED_SHA, deployed SHA $DEPLOYED_SHA" >&2
+  exit 1
 fi
 
 if [[ ! -x "$APP_DIR/.venv/bin/python" ]]; then
