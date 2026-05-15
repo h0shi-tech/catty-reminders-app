@@ -40,7 +40,9 @@ jobs:
           script: |
             cd "${{ secrets.APP_DIR }}"
             IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}" \
+            CATTY_IMAGE="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}" \
             GITHUB_ACTOR="${{ github.actor }}" \
             GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            COMPOSE_PROJECT_NAME=catty-nikishin \
             APP_DIR="$PWD" \
             ./scripts/deploy.sh lab4 ${{ github.sha }}

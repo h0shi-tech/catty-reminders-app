@@ -1,5 +1,7 @@
+name: catty-nikishin
+
 services:
-  db:
+  database:
     image: mariadb:10.11
     container_name: catty-db
     restart: unless-stopped
@@ -8,28 +10,29 @@ services:
       MYSQL_DATABASE: catty_reminders
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 20s
+      retries: 12
+      start_period: 25s
     volumes:
-      - catty-db-data:/var/lib/mysql
+      - catty_mysql_data:/var/lib/mysql
 
-  app:
-    image: ${IMAGE:-catty-reminders-app:local}
+  web:
+    image: ${CATTY_IMAGE:-catty-reminders-app:local}
     container_name: catty-reminders-app
     restart: unless-stopped
+    pull_policy: always
     depends_on:
-      db:
+      database:
         condition: service_healthy
     ports:
       - "8181:8181"
     environment:
-      DB_HOST: db
+      DB_HOST: database
       DB_PORT: "3306"
       DB_USER: root
       DB_PASSWORD: mypass
       DB_NAME: catty_reminders
 
 volumes:
-  catty-db-data:
+  catty_mysql_data:
